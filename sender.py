@@ -1,5 +1,6 @@
 import os
 import smtplib
+import sys
 
 from private import EMAIL_ADDRESS, EMAIL_PASSWORD
 
@@ -28,7 +29,6 @@ def custom_message():
 
     return [receiver, message]
 
-
 def send_email(receiver=EMAIL_ADDRESS, message=test_message()):
     """
     Sends messages through gmail service.
@@ -46,8 +46,8 @@ def send_email(receiver=EMAIL_ADDRESS, message=test_message()):
         #smtp.sendmail(SENDER, RECEIVER, MESSAGE)
         smtp.sendmail(EMAIL_ADDRESS, receiver, message)
 
-
 if __name__ == '__main__':
+    # use sys.argv values to make custom messages from terminal
     ans = input("Would you like to send custom message? ")
     if ans in AFFRIMATIVE:
         receiver, message = custom_message()
