@@ -12,6 +12,7 @@ import smtplib
 # Gets email and email password from private file
 from private import EMAIL_ADDRESS, EMAIL_PASSWORD, PHONE_ADDRESS
 
+
 def test_message():
     """
     :return: Simple email message template string
@@ -24,74 +25,86 @@ def test_message():
 
 def custom_message():
     """
-    :return: List containing receiver and message
+    Constructs Custom Message Template
+
+    :return: None
     """
     receiver = input("Input message recipient: ")
-    subject = input("Input message subject: ")
+    # no receiver inputted --> send to self
+    if not receiver:
+        subject = 'Quick Message'
+    else:
+        subject = input("Input message subject: ")
+
     body = input("Input message body: ")
     message = f'Subject: {subject}\n\n{body}'
+    send_email(message)
 
-    return [receiver, message]
-
-def quick_message(receiver=None, body=None):
-    """
-    Asks for receiver then body input (if not specified in command line).
-    :return: List containing receiver and message
-    """
-    subject = "Quick Message"
-    if not receiver:
-        receiver = input("Input message recipient: ")
-
-    if not body:
-        body = input("Input message body: ")
-
-    message = f'Subject: {subject}\n\n{body}'
-    return [receiver, message]
+    #arg_dict = {'receiver':receiver, 'message':message}
+    #determine_message_option(arg_dict)
+    return None
 
 def quick_send(message):
     """
     Constructs Quick Message Template
 
+    send_text() not working as intended.
+    send_email() used for now.
+
     :return: None
     """
     subject = 'Quick Message'
     quick_message = f'Subject: {subject}\n\n{message}'
-    send_text(quick_message)
-    return
+    #send_text(quick_message)
+    send_email(quick_message)
+    return None
 
-
-def determine_message_method(message, receiver=None):
+def determine_message_option(arg_dict):
     """
-    Determines how to send a message.
+    Determines which message template to use using arg_dict.
+    arg_dict = {'message': value(s),
+                'receiver': value(s)
+    }
 
-    Default: quick_send()
-        no receiver then use Quick Message Template
-
-    Try to send message as text first.
-    Then try to send message as email.
-        (will add custom messages to this later)
+    Four Options:
+        1. quick_send(message)
+            - no receiver means message to self (Quick Message Template)
+        2. custom_message()
+            - no message and no receiver (Custom Message Template)
+        3. send_text(message, receiver)
+            - receiver must be a number (phone number check later)
+        4. send_email(message, receiver)
+            - sends message as email as last option
 
     :return: None
     """
-    # Default
-    if not receiver:
-        # send message to self
+    message = arg_dict['message']
+    receiver = arg_dict['receiver']
+
+    # send message to self with Quick Message Template
+    if message and not receiver:
         quick_send(message)
         return None
 
+    # input information into Custom Message Template
+    elif not message and not receiver:
+        custom_message()
+        return None
+
+    # message and receiver is supplied
+    # test to determine if receiver is a number
     try:
         number = int(receiver)
-        send_text(message, receiver)
+        send_text(message, receiver) # not working as intended
 
     except ValueError:
-        #print(f'Receiver: {receiver} is not a number.')
         send_email(message, receiver)
     return None
 
 def input_carrier(extensions):
     """
     Gives options for carrier extensions.
-    Asks for user's input for carrier
+    User inputs a carrier
 
     :return: String containing user input (carrier)
     """
@@ -127,6 +140,7 @@ def get_receiver_extension(number):
                           't-mobile':'tmomail.net'}
     carrier = input_carrier(carrier_extensions)
     try:
+        # checks if carrier is included in dictionary
         number_contact = f'{number}@{carrier_extensions[carrier]}'
 
     except KeyError as key:
@@ -142,8 +156,13 @@ def send_text(message=test_message(), receiver=PHONE_ADDRESS):
     Sends messages through gmail service to phone number.
     Default message is a test message sent to self.
 
+    **Currently, send_text is not working as intended.
+        - every message is sent through a different contact on phone.
+        - long delay between sent and delivery.
+
     :return: None
     """
+    # PHONE_ADDRESS number that is saved to file
     if receiver is not PHONE_ADDRESS:
         receiver = get_receiver_extension(receiver)
 
@@ -159,6 +178,7 @@ def send_email(message=test_message(), receiver=EMAIL_ADDRESS):
     :return: None
     """
     with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+        # starts communication with email server
         smtp.ehlo()
         smtp.starttls()
         smtp.ehlo()
@@ -167,4 +187,5 @@ def send_email(message=test_message(), receiver=EMAIL_ADDRESS):
 
         #smtp.sendmail(SENDER, RECEIVER, MESSAGE)
         smtp.sendmail(EMAIL_ADDRESS, receiver, message)
+    print('Message sent!')
     return None

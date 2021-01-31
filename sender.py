@@ -1,30 +1,28 @@
 # sender.py
 import sys
+from argparse import ArgumentParser
 
-from sender_messages import send_email, send_text
+from sender_messages import determine_message_option
 
-AFFRIMATIVE = ['y', 'yes', 'yeah']
-# Adding way to send argument from command line:
-#   py sender.py -quick "Message to receiver" -r receiver_email(or number)
-#                -type_of_message_flag -receiver_flag
+#AFFRIMATIVE = ['y', 'yes', 'yeah']
 
-def check_args():
+def get_args():
     """
-    Gets arguments from command line.
+    Get arguments from command line.
+
+    :return: Dictionary of argument options and their values
     """
-    pass
+    parser = ArgumentParser()
+    parser.add_argument('-m', '--message', nargs='*',
+                        help='Quick Message: Send messages to self from commandline.')
+    parser.add_argument('-r', '--receiver', nargs='*',
+                        help='Receiver contact information goes after flag.')
+
+    args = vars(parser.parse_args())
+    return args
 
 
 if __name__ == '__main__':
     # use sys.argv values to make custom messages from terminal
-    check_args()
-
-    #ans = input("Would you like to send custom message? ")
-    #if ans in AFFRIMATIVE:
-        #receiver, message = custom_message()
-        #send_email(receiver, message)
-
-    # Test Message
-    send_email()
-
-    print("Test Message sent!")
+    args = get_args()
+    determine_message_option(args)
