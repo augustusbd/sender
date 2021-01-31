@@ -13,6 +13,34 @@ import smtplib
 from private import EMAIL_ADDRESS, EMAIL_PASSWORD, PHONE_ADDRESS
 
 
+def combine_strings(string_list):
+    """
+    Combine string_list's values into a new string
+     with spaces inserted between list values.
+
+    :return: string
+    """
+    if isinstance(string_list, list):
+        new_string = ''
+        insert_spaces(string_list)
+        for item in string_list:
+            new_string += item
+        return new_string
+    return string_list
+
+def insert_spaces(string_list):
+    """
+    Inserts whitespace inbetween words in list.
+
+    :return: None
+    """
+    num_spaces = len(string_list) - 1
+    for i in range(num_spaces):
+        # insert spaces into odd indexes
+        index = 2*i + 1
+        string_list.insert(index, ' ')
+    return None
+
 def test_message():
     """
     :return: Simple email message template string
@@ -80,6 +108,10 @@ def determine_message_option(arg_dict):
     """
     message = arg_dict['message']
     receiver = arg_dict['receiver']
+
+    # converts message value into a string
+    message = combine_strings(message)
+    receiver = combine_strings(receiver)
 
     # send message to self with Quick Message Template
     if message and not receiver:
