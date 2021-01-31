@@ -12,6 +12,7 @@ To Run:
 Future milestones:
     Send text messages to phone from computer.
     Send automated alerts to phone/email about user's interests.
+    Send delayed messages for reminders.
 
     Add Program Options
       Quick Message Flags:
